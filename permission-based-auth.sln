@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Domain", "Auth.Domain\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Application", "Auth.Application\Auth.Application.csproj", "{1A3E0018-65E1-4BC8-BD88-8962304ED8D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Infrastucture", "Auth.Infrastucture\Auth.Infrastucture.csproj", "{2AB9B1DB-461D-410E-93B2-C0517325993F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Infrastructure", "Auth.Infrastructure\Auth.Infrastructure.csproj", "{2AB9B1DB-461D-410E-93B2-C0517325993F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

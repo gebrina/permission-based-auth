@@ -4,6 +4,8 @@ using Auth.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+namespace Auth.Infrastructure.Services;
+
 public class UserService : IUserService
 {
     private readonly UserManager<ApplicationUser> _userManager;
