@@ -1,5 +1,4 @@
 using Auth.Domain.Dtos;
-using Auth.Domain.Entities;
 
 namespace Auth.Application.Repository;
 
