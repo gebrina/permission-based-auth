@@ -1,32 +1,40 @@
 using Auth.Application.Repository;
+using Auth.Application.Services;
 using Auth.Domain.Dtos;
 
 namespace Auth.Infrastructure.Repository;
 
 public class UserRepository : IUserRepository
 {
-    public Task<bool> CreateUserAsync(CreateUserDto user)
+    private readonly IUserService _userService;
+
+    public UserRepository(IUserService userService)
     {
-        throw new NotImplementedException();
+        _userService = userService;
     }
 
-    public Task<bool> DeleteUserAsync(UserDto user)
+    public async Task<bool> CreateUserAsync(CreateUserDto user)
     {
-        throw new NotImplementedException();
+        return await _userService.CreateUserAsync(user);
     }
 
-    public Task<UserDto> GetUserByIdAsync(string id)
+    public async Task<bool> DeleteUserAsync(UserDto user)
     {
-        throw new NotImplementedException();
+        return await _userService.DeleteUserAsync(user);
     }
 
-    public Task<IEnumerable<UserDto>> GetUsersAsync()
+    public async Task<UserDto> GetUserByIdAsync(string id)
     {
-        throw new NotImplementedException();
+        return await _userService.GetUserByIdAsync(id);
     }
 
-    public Task<bool> UpdateUserAsync(UserDto user)
+    public async Task<IEnumerable<UserDto>> GetUsersAsync()
     {
-        throw new NotImplementedException();
+        return await _userService.GetUsersAsync();
+    }
+
+    public async Task<bool> UpdateUserAsync(UserDto user)
+    {
+        return await _userService.UpdateUserAsync(user);
     }
 }
