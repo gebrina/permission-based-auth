@@ -4,9 +4,9 @@ namespace Auth.Application.Services;
 
 public interface IRoleService
 {
-    Task<IEnumerable<RoleDto>> GetUsersAsync();
-    Task<RoleDto> GetUserByIdAsync(string id);
-    Task<bool> CreateUserAsync(CreateRoleDto user);
-    Task<bool> UpdateUserAsync(RoleDto user);
-    Task<bool> DeleteUserAsync(RoleDto user);
+    Task<IEnumerable<RoleDto>> GetRolesAsync();
+    Task<RoleDto> GetRoleByIdAsync(string id);
+    Task<bool> CreateRoleAsync(CreateRoleDto role);
+    Task<bool> UpdateRoleAsync(RoleDto role);
+    Task<bool> DeleteRoleAsync(RoleDto role);
 }
