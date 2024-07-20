@@ -1,7 +1,13 @@
+using FluentValidation;
 using Auth.Domain.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Auth.Application.Repository;
+using Auth.Infrastructure.Repository;
+using Auth.Application.Services;
+using Auth.Infrastructure.Services;
+using Auth.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +29,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     });
 });
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>().
 AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
