@@ -1,6 +1,7 @@
 using Auth.Domain.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,19 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 AddDefaultTokenProviders();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Permission based auto in ASP.NET Core",
+        Contact = new OpenApiContact
+        {
+            Email = "youremail@email.com"
+        }
+    });
+});
+
 
 var app = builder.Build();
 
