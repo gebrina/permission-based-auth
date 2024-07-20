@@ -1,3 +1,4 @@
+using Auth.Api.Utils;
 using Auth.Application.Repository;
 using Auth.Domain.Dtos;
 using FluentValidation;
@@ -42,7 +43,10 @@ public class UsersController : ControllerBase
         var validtionResult = await _createUserDtoValidator.ValidateAsync(userDto);
 
         if (!validtionResult.IsValid)
-            return BadRequest(validtionResult.Errors);
+        {
+            var formattedErros = FormatErrorMessage.Generate(validtionResult.Errors);
+            return BadRequest(formattedErros);
+        }
 
         var isCreated = await _userRepo.CreateUserAsync(userDto);
         if (!isCreated) return StatusCode(500);
@@ -55,7 +59,11 @@ public class UsersController : ControllerBase
     public async Task<ActionResult> EditUser([FromBody] UserDto userDto)
     {
         var validtionResult = await _userDtoValidator.ValidateAsync(userDto);
-        if (!validtionResult.IsValid) return BadRequest(validtionResult.Errors);
+        if (!validtionResult.IsValid)
+        {
+            var formattedErros = FormatErrorMessage.Generate(validtionResult.Errors);
+            return BadRequest(formattedErros);
+        }
 
         var isUpdated = await _userRepo.UpdateUserAsync(userDto);
         if (!isUpdated) return StatusCode(500);
