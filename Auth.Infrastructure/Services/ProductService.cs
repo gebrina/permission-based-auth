@@ -1,33 +1,68 @@
 using Auth.Application.Services;
+using Auth.Domain.Data;
 using Auth.Domain.Dtos;
 using Auth.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Infrastructure.Services;
 
 public class ProductService : IProductService
 {
-    public Task<bool> CreateProduct(CreateProductDto productDto)
+    private readonly ApplicationDbContext _dbContext;
+
+    public ProductService(ApplicationDbContext dbContext)
     {
-        throw new NotImplementedException();
+        _dbContext = dbContext;
     }
 
-    public Task<bool> DeleteProduct(string id)
+    public async Task<bool> CreateProduct(CreateProductDto productDto)
     {
-        throw new NotImplementedException();
+        var product = new Product
+        {
+            Name = productDto.Name,
+            Price = productDto.Price,
+            Image = productDto.Image,
+            Category = productDto.Category
+        };
+        var state = await _dbContext.Products.AddAsync(product);
+        await _dbContext.SaveChangesAsync();
+        if (state.Entity.Id == null) return false;
+
+        return true;
     }
 
-    public Task<Product> GetProductByIdAsync(string id)
+    public async Task<bool> DeleteProduct(string id)
     {
-        throw new NotImplementedException();
+        var product = await _dbContext.Products.FirstOrDefaultAsync(_ => _.Id == id);
+        if (product == null) return false;
+
+        _dbContext.Products.Remove(product);
+        _dbContext.SaveChanges();
+        return true;
     }
 
-    public Task<IEnumerable<Product>> GetProductsAsync()
+    public async Task<Product> GetProductByIdAsync(string id)
     {
-        throw new NotImplementedException();
+        var product = await _dbContext.Products.FirstAsync(_ => _.Id == id);
+        return product;
     }
 
-    public Task<bool> UpdateProduct(Product product)
+    public async Task<IEnumerable<Product>> GetProductsAsync()
     {
-        throw new NotImplementedException();
+        var products = await _dbContext.Products.ToListAsync();
+        return products;
+    }
+
+    public async Task<bool> UpdateProduct(Product product)
+    {
+        var productInDb = await _dbContext.Products.FindAsync(product);
+        if (productInDb == null) return false;
+
+        productInDb.Name = product.Name;
+        productInDb.Category = product.Category;
+        productInDb.Price = product.Price;
+        productInDb.Image = product.Image;
+        await _dbContext.SaveChangesAsync();
+        return true;
     }
 }

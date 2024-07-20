@@ -10,4 +10,5 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
     }
 
+    public DbSet<Product> Products { get; set; }
 }
