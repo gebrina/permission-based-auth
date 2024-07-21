@@ -33,7 +33,7 @@ public class RoleRepository : IRoleRepository
         return await _roleService.GetRolesAsync();
     }
 
-    public async Task<bool> UpdateRoleAsync(RoleDto role)
+    public async Task<(string, bool)> UpdateRoleAsync(RoleDto role)
     {
         return await _roleService.UpdateRoleAsync(role);
     }

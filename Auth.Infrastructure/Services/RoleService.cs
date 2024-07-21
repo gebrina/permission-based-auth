@@ -61,15 +61,15 @@ public class RoleService : IRoleService
         return roleDtos;
     }
 
-    public async Task<bool> UpdateRoleAsync(RoleDto role)
+    public async Task<(string, bool)> UpdateRoleAsync(RoleDto role)
     {
         var appRole = await _roleManager.FindByIdAsync(role.Id);
-        if (appRole == null) return false;
+        if (appRole == null) return ("Invalid role", false);
 
         appRole.Name = role.Name;
 
         var result = await _roleManager.UpdateAsync(appRole);
-        if (result.Succeeded) return true;
-        return false;
+        if (result.Succeeded) return (string.Empty, true);
+        return ("Something went wrong.", false);
     }
 }

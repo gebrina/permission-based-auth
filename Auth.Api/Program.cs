@@ -9,8 +9,6 @@ using Auth.Application.Services;
 using Auth.Infrastructure.Services;
 using Auth.Domain.Entities;
 using Auth.Api.Common;
-using System.Text.Json;
-using Microsoft.AspNetCore.Http.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,8 +37,14 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>().
 AddDefaultTokenProviders();
 
+// user
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+// role
+
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
