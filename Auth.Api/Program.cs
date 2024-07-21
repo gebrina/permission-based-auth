@@ -8,6 +8,9 @@ using Auth.Infrastructure.Repository;
 using Auth.Application.Services;
 using Auth.Infrastructure.Services;
 using Auth.Domain.Entities;
+using Auth.Api.Common;
+using System.Text.Json;
+using Microsoft.AspNetCore.Http.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +20,11 @@ throw new InvalidOperationException("Invalid databse connection string");
 builder.Services.AddControllers()
 .AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    // assign null value for naming policy to make them lowercases.
+    options.JsonSerializerOptions.PropertyNamingPolicy = new FlatCasePolicy();
 });
+
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -62,6 +68,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+app.UseMiddleware<ExceptionMiddleware>();
 app.MapControllers();
 
 app.Run();
