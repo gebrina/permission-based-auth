@@ -26,6 +26,7 @@ public class ProductService : IProductService
         };
         var state = await _dbContext.Products.AddAsync(product);
         await _dbContext.SaveChangesAsync();
+
         if (state.Entity.Id == null) return (
             message: "Something went wrong",
             created: false
@@ -71,10 +72,9 @@ public class ProductService : IProductService
         productInDb.Category = product.Category;
         productInDb.Price = product.Price;
         productInDb.Image = product.Image;
-        await _dbContext.SaveChangesAsync();
 
         return (
-            message: "Product successfully updated.",
+            message: string.Empty,
             updated: true
         );
     }
