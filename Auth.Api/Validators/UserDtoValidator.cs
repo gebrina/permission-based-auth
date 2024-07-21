@@ -2,7 +2,7 @@
 using Auth.Domain.Dtos;
 using FluentValidation;
 
-namespace Auth.Api.Validations;
+namespace Auth.Api.Validators;
 
 
 public class UserDtoValidator : AbstractValidator<UserDto>
