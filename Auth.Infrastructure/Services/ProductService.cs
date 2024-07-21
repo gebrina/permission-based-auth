@@ -15,7 +15,7 @@ public class ProductService : IProductService
         _dbContext = dbContext;
     }
 
-    public async Task<bool> CreateProduct(CreateProductDto productDto)
+    public async Task<(string message, bool created)> CreateProduct(CreateProductDto productDto)
     {
         var product = new Product
         {
@@ -26,9 +26,15 @@ public class ProductService : IProductService
         };
         var state = await _dbContext.Products.AddAsync(product);
         await _dbContext.SaveChangesAsync();
-        if (state.Entity.Id == null) return false;
+        if (state.Entity.Id == null) return (
+            message: "Something went wrong",
+            created: false
+        );
 
-        return true;
+        return (
+            message: string.Empty,
+            created: true
+        ); ;
     }
 
     public async Task<bool> DeleteProduct(string id)
@@ -53,16 +59,23 @@ public class ProductService : IProductService
         return products;
     }
 
-    public async Task<bool> UpdateProduct(Product product)
+    public async Task<(string message, bool updated)> UpdateProduct(Product product)
     {
         var productInDb = await _dbContext.Products.FindAsync(product);
-        if (productInDb == null) return false;
+        if (productInDb == null) return (
+            message: "Invalid product",
+            updated: false
+        );
 
         productInDb.Name = product.Name;
         productInDb.Category = product.Category;
         productInDb.Price = product.Price;
         productInDb.Image = product.Image;
         await _dbContext.SaveChangesAsync();
-        return true;
+
+        return (
+            message: "Product successfully updated.",
+            updated: true
+        );
     }
 }
