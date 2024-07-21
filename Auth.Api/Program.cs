@@ -44,7 +44,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Permission based auto in ASP.NET Core",
+        Title = "Permission based auth in ASP.NET Core",
         Contact = new OpenApiContact
         {
             Email = "youremail@email.com"
