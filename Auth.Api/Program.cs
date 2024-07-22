@@ -9,6 +9,7 @@ using Auth.Application.Services;
 using Auth.Infrastructure.Services;
 using Auth.Domain.Entities;
 using Auth.Api.Common;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,8 +23,6 @@ builder.Services.AddControllers()
     options.JsonSerializerOptions.PropertyNamingPolicy = new FlatCasePolicy();
 });
 
-
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(connectionString, config =>
@@ -36,6 +35,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>().
 AddDefaultTokenProviders();
+
+builder.Services.Configure<ApiBehaviorOptions>(options=>{
+    options.SuppressModelStateInvalidFilter=true;
+});
 
 // user
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -74,6 +77,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
 app.UseRouting();
 app.UseMiddleware<ExceptionMiddleware>();
 app.MapControllers();

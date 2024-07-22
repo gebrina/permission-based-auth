@@ -12,7 +12,6 @@ public class CreateProductDtoValidator : AbstractValidator<CreateProductDto>
         .Matches("^[a-zA-z]+([0-9])*$").WithMessage("Product name must start with letters only");
         RuleFor(product => product.Price).GreaterThan(0).NotEmpty()
         .LessThan(1000);
-        RuleFor(product => product.Image).NotEmpty().NotNull();
         RuleFor(product => product.Category).NotNull().NotEmpty()
         .WithMessage("Product category is required.");
     }

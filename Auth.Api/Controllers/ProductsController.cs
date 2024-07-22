@@ -3,7 +3,9 @@ using Auth.Application.Repository;
 using Auth.Domain.Dtos;
 using Auth.Domain.Entities;
 using FluentValidation;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Auth.Api.Controllers;
 
@@ -39,7 +41,8 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateProduct([FromBody] CreateProductDto productDto)
+    public async Task<ActionResult> CreateProduct(
+    [FromForm] CreateProductDto productDto, IFormFile productImage)
     {
         var validationResult = await _createProductValidator.ValidateAsync(productDto);
         if (!validationResult.IsValid)
@@ -47,7 +50,23 @@ public class ProductsController : ControllerBase
             var formattedErrorResponse = FormatErrorMessage.Generate(validationResult.Errors);
             return BadRequest(formattedErrorResponse);
         }
+        else if (productImage?.Length <= 0 || productImage?.FileName == null)
+        {
+            return BadRequest("Prodcut image is required field.");
+        }
 
+        var fileName = string.Concat(Guid.NewGuid(), productImage?.FileName.Replace(" ", "-"));
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", fileName);
+        using (var stream = new FileStream(filePath, FileMode.OpenOrCreate))
+        {
+            await productImage.CopyToAsync(stream);
+        }
+
+        var fileUrl = string.Concat(
+             HttpContext.Request.GetDisplayUrl()
+            .Replace(HttpContext.Request.Path, ""), 
+            "/uploads/", fileName);
+         productDto.Image=fileUrl;
         (string message, bool created) = await _productRepo.CreateProduct(productDto);
 
         if (!string.IsNullOrEmpty(message) && !created)

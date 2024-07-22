@@ -19,6 +19,7 @@ public class ProductService : IProductService
     {
         var product = new Product
         {
+            Id=Guid.NewGuid().ToString(),
             Name = productDto.Name,
             Price = productDto.Price,
             Image = productDto.Image,
