@@ -1,7 +1,9 @@
+using Auth.Domain.Data;
 using Auth.Application.Services;
 using Auth.Domain.Dtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace Auth.Infrastructure.Services;
 
@@ -21,10 +23,23 @@ public class RoleService : IRoleService
         {
             Name = role.Name
         };
-
         var result = await _roleManager.CreateAsync(appRole);
-        if (result.Succeeded) return true;
+        if (result.Succeeded)
+        {
+          
+            if (appRole.NormalizedName == Permissions.ADMIN.ToString())
+            {
+        
+            }
+            else if (appRole.NormalizedName == Permissions.EDITOR.ToString())
+            {
 
+            }
+            else
+            {
+
+            }
+        }
         return false;
     }
 

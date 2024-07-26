@@ -1,3 +1,4 @@
+using System.Reflection;
 using Auth.Api.Utils;
 using Auth.Application.Repository;
 using Auth.Domain.Dtos;
@@ -75,15 +76,14 @@ public class RolesController : ControllerBase
             var formattedErrorResponse = FormatErrorMessage.Generate(validationResult.Errors);
             return BadRequest(formattedErrorResponse);
         }
-        
+
         if (await _roleRepo.CheckRoleExistanceAsync(roleDto.Name))
             return BadRequest("Role already registered.");
 
-        var isCreated = await _roleRepo.CreateRoleAsync(roleDto);
-
-        if (isCreated) return Created();
-
+        var isRoleCreated = await _roleRepo.CreateRoleAsync(roleDto);
+        if (isRoleCreated) return Created();
         return StatusCode(500);
+        // return Ok(GetActionNames());
     }
 
 
@@ -95,5 +95,22 @@ public class RolesController : ControllerBase
 
         await _roleRepo.DeleteRoleAsync(roleToBeDeleted);
         return NoContent();
+    }
+
+    [NonAction]
+    private List<string> GetActionNames()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var actionsControllerTypes = assembly.GetTypes()
+        .Where(type => typeof(ControllerBase).IsAssignableFrom(type));
+        var actionNames = actionsControllerTypes.SelectMany(t => t.GetMethods())
+        .Where(method => (!method.IsDefined(typeof(NonActionAttribute))) &&
+          (method.IsDefined(typeof(HttpPostAttribute)) |
+          method.IsDefined(typeof(HttpGetAttribute)) |
+          method.IsDefined(typeof(HttpPutAttribute)) |
+          method.IsDefined(typeof(HttpDeleteAttribute)))
+        ).Select(method => method.Name).ToList();
+
+        return actionNames;
     }
 }
