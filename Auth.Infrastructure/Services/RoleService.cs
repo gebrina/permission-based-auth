@@ -27,7 +27,7 @@ public class RoleService : IRoleService
 
         return false;
     }
-    
+
     public async Task<bool> DeleteRoleAsync(RoleDto role)
     {
         var appRole = await _roleManager.FindByIdAsync(role.Id);
@@ -74,9 +74,9 @@ public class RoleService : IRoleService
         return ("Something went wrong.", false);
     }
 
-   public async Task<bool> CheckRoleExistanceAsync(string roleName)
-   {
-     var roleExist = await _roleManager.RoleExistsAsync(roleName);
-     return roleExist;
-   }
+    public async Task<bool> CheckRoleExistanceAsync(string roleName)
+    {
+        var roleExist = await _roleManager.RoleExistsAsync(roleName);
+        return roleExist;
+    }
 }
