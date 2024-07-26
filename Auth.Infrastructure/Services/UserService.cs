@@ -9,9 +9,12 @@ namespace Auth.Infrastructure.Services;
 public class UserService : IUserService
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
 
-    public UserService(UserManager<ApplicationUser> userManager)
+    public UserService(UserManager<ApplicationUser> userManager,
+    RoleManager<IdentityRole> roleManager)
     {
+        _roleManager=roleManager;
         _userManager = userManager;
     }
 
@@ -25,10 +28,18 @@ public class UserService : IUserService
             LastName = user.LastName,
             Profession = user.Profession
         };
-
+      
         IdentityResult result = await _userManager.CreateAsync(appUser, user.Password);
-        if (result.Succeeded) return true;
-
+        if (result.Succeeded){
+            if(user.Roles.Count>0){
+             foreach(var role in user.Roles){
+               if(await _roleManager.RoleExistsAsync(role))
+                await _userManager.AddToRoleAsync(appUser,role);
+             }
+            }
+          return true;
+        }
+        
         return false;
     }
 
@@ -42,9 +53,10 @@ public class UserService : IUserService
 
     public async Task<UserDto> GetUserByIdAsync(string id)
     {
+        UserDto userDto = new();
         var appUser = await _userManager.FindByIdAsync(id);
-        UserDto userDto = new UserDto();
-        if (appUser != null && appUser.Email != null && appUser.UserName != null)
+        
+        if (appUser?.Email != null && appUser.UserName != null)
         {
             userDto.Id = appUser.Id;
             userDto.UserName = appUser.UserName;
@@ -52,6 +64,7 @@ public class UserService : IUserService
             userDto.Profession = appUser.Profession;
             userDto.FirstName = appUser.FirstName;
             userDto.LastName = appUser.LastName;
+            userDto.Roles= await _userManager.GetRolesAsync(appUser);
         }
 
         return userDto;
@@ -60,7 +73,7 @@ public class UserService : IUserService
     public async Task<IEnumerable<UserDto>> GetUsersAsync()
     {
         var appUsers = await _userManager.Users.ToListAsync();
-        var users = appUsers.Select(appUser => new UserDto
+        var users =  appUsers.Select( async appUser => new UserDto
         {
             Id = appUser.Id,
             UserName = appUser.UserName ?? "",
@@ -68,9 +81,10 @@ public class UserService : IUserService
             Profession = appUser.Profession,
             FirstName = appUser.FirstName,
             LastName = appUser.LastName,
-        });
+            Roles = await _userManager.GetRolesAsync(appUser)
+        }) as Task<IEnumerable<UserDto>>;
 
-        return users;
+        return await users ;
     }
 
     public async Task<bool> UpdateUserAsync(UserDto userDto)

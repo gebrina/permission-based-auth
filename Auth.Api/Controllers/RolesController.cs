@@ -75,6 +75,9 @@ public class RolesController : ControllerBase
             var formattedErrorResponse = FormatErrorMessage.Generate(validationResult.Errors);
             return BadRequest(formattedErrorResponse);
         }
+        
+        if (await _roleRepo.CheckRoleExistanceAsync(roleDto.Name))
+            return BadRequest("Role already registered.");
 
         var isCreated = await _roleRepo.CreateRoleAsync(roleDto);
 

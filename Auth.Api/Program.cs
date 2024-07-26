@@ -36,6 +36,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>().
 AddDefaultTokenProviders();
 
+// Disable defautl model validation
 builder.Services.Configure<ApiBehaviorOptions>(options=>{
     options.SuppressModelStateInvalidFilter=true;
 });

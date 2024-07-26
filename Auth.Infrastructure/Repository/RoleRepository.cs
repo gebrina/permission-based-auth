@@ -37,4 +37,9 @@ public class RoleRepository : IRoleRepository
     {
         return await _roleService.UpdateRoleAsync(role);
     }
+
+    public async Task<bool> CheckRoleExistanceAsync(string roleName)
+    {
+        return await _roleService.CheckRoleExistanceAsync(roleName);
+    }
 }
