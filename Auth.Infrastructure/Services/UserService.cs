@@ -73,10 +73,14 @@ public class UserService : IUserService
         return userDto;
     }
 
-    public async Task<IEnumerable<UserDto>> GetUsersAsync()
+    public async Task<IEnumerable<UserDto>> GetUsersAsync(PagingFilterRequest request)
     {
         var appUsers = await _userManager.Users.ToListAsync();
-        var users = await appUsers.ToAsyncEnumerable().SelectAwait(async (appUser) => new UserDto
+        int pageNumber = request.PageNumber;
+        int limit = request.Limit;
+        appUsers = appUsers.Skip((pageNumber-1)*limit).Take(limit).ToList();
+
+         var users = await appUsers.ToAsyncEnumerable().SelectAwait(async (appUser) => new UserDto
         {
             Id = appUser.Id,
             UserName = appUser.UserName ?? "",

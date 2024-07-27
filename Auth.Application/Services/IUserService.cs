@@ -5,7 +5,7 @@ namespace Auth.Application.Services;
 
 public interface IUserService
 {
-    Task<IEnumerable<UserDto>> GetUsersAsync();
+    Task<IEnumerable<UserDto>> GetUsersAsync(PagingFilterRequest request);
     Task<UserDto> GetUserByIdAsync(string id);
     Task<bool> CreateUserAsync(CreateUserDto user);
     Task<bool> UpdateUserAsync(UserDto user);

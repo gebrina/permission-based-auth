@@ -28,9 +28,9 @@ public class UserRepository : IUserRepository
         return await _userService.GetUserByIdAsync(id);
     }
 
-    public async Task<IEnumerable<UserDto>> GetUsersAsync()
+    public async Task<IEnumerable<UserDto>> GetUsersAsync(PagingFilterRequest request)
     {
-        return await _userService.GetUsersAsync();
+        return await _userService.GetUsersAsync(request);
     }
 
     public async Task<bool> UpdateUserAsync(UserDto user)

@@ -23,9 +23,9 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerator<UserDto>>> ViewUsers()
+    public async Task<ActionResult<IEnumerator<UserDto>>> ViewUsers([FromQuery]PagingFilterRequest request)
     {
-        var users = await _userRepo.GetUsersAsync();
+        var users = await _userRepo.GetUsersAsync(request);
         return Ok(users);
     }
 
