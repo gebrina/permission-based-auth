@@ -79,11 +79,10 @@ public class RolesController : ControllerBase
 
         if (await _roleRepo.CheckRoleExistanceAsync(roleDto.Name))
             return BadRequest("Role already registered.");
-
+        roleDto.ActionNames = GetActionNames();
         var isRoleCreated = await _roleRepo.CreateRoleAsync(roleDto);
         if (isRoleCreated) return Created();
-        return StatusCode(500);
-        // return Ok(GetActionNames());
+        return StatusCode(500,"Something went wrong.");
     }
 
 
@@ -91,23 +90,24 @@ public class RolesController : ControllerBase
     public async Task<IActionResult> DeleteRole([FromRoute] string id)
     {
         var roleToBeDeleted = await _roleRepo.GetRoleByIdAsync(id);
-        if (roleToBeDeleted == null) return BadRequest();
+        if (string.IsNullOrEmpty(roleToBeDeleted.Id)) return BadRequest("Invalid role's id.");
 
         await _roleRepo.DeleteRoleAsync(roleToBeDeleted);
         return NoContent();
     }
 
     [NonAction]
-    private List<string> GetActionNames()
+    private static List<string> GetActionNames()
     {
         var assembly = Assembly.GetExecutingAssembly();
         var actionsControllerTypes = assembly.GetTypes()
         .Where(type => typeof(ControllerBase).IsAssignableFrom(type));
+
         var actionNames = actionsControllerTypes.SelectMany(t => t.GetMethods())
         .Where(method => (!method.IsDefined(typeof(NonActionAttribute))) &&
-          (method.IsDefined(typeof(HttpPostAttribute)) |
-          method.IsDefined(typeof(HttpGetAttribute)) |
-          method.IsDefined(typeof(HttpPutAttribute)) |
+          (method.IsDefined(typeof(HttpPostAttribute)) ||
+          method.IsDefined(typeof(HttpGetAttribute)) ||
+          method.IsDefined(typeof(HttpPutAttribute)) ||
           method.IsDefined(typeof(HttpDeleteAttribute)))
         ).Select(method => method.Name).ToList();
 

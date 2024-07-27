@@ -64,9 +64,9 @@ public class ProductsController : ControllerBase
 
         var fileUrl = string.Concat(
              HttpContext.Request.GetDisplayUrl()
-            .Replace(HttpContext.Request.Path, ""), 
+            .Replace(HttpContext.Request.Path, ""),
             "/uploads/", fileName);
-         productDto.Image=fileUrl;
+        productDto.Image = fileUrl;
         (string message, bool created) = await _productRepo.CreateProduct(productDto);
 
         if (!string.IsNullOrEmpty(message) && !created)

@@ -3,7 +3,7 @@ using Auth.Application.Services;
 using Auth.Domain.Dtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
+using System.Security.Claims;
 
 namespace Auth.Infrastructure.Services;
 
@@ -23,22 +23,41 @@ public class RoleService : IRoleService
         {
             Name = role.Name
         };
+
         var result = await _roleManager.CreateAsync(appRole);
         if (result.Succeeded)
         {
-          
+
             if (appRole.NormalizedName == Permissions.ADMIN.ToString())
             {
-        
+                foreach (string claimName in role.ActionNames)
+                {
+                    var claim = new Claim("Permission", claimName);
+                    await _roleManager.AddClaimAsync(appRole, claim);
+                }
             }
             else if (appRole.NormalizedName == Permissions.EDITOR.ToString())
             {
-
+                var editorActions = role.ActionNames.Where(name =>
+                 name.StartsWith("Edit", StringComparison.OrdinalIgnoreCase) ||
+                name.StartsWith("View", StringComparison.OrdinalIgnoreCase));
+                foreach (string claimName in editorActions)
+                {
+                    var claim = new Claim("Permission", claimName);
+                    await _roleManager.AddClaimAsync(appRole, claim);
+                }
             }
             else
             {
-
+                var editorActions = role.ActionNames.Where(name =>
+                  name.StartsWith("View", StringComparison.OrdinalIgnoreCase));
+                foreach (string claimName in editorActions)
+                {
+                    var claim = new Claim("Permission", claimName);
+                    await _roleManager.AddClaimAsync(appRole, claim);
+                }
             }
+            return true;
         }
         return false;
     }
@@ -68,11 +87,12 @@ public class RoleService : IRoleService
     public async Task<IEnumerable<RoleDto>> GetRolesAsync()
     {
         var appRoles = await _roleManager.Roles.ToListAsync();
-        var roleDtos = appRoles.Select(appRole => new RoleDto
+        var roleDtos = await appRoles.ToAsyncEnumerable().SelectAwait(async appRole => new RoleDto
         {
             Id = appRole.Id,
-            Name = appRole.Name ?? ""
-        });
+            Name = appRole.Name ?? "",
+            Permissions = (await _roleManager.GetClaimsAsync(appRole)).Select(x => x.Value).ToList()
+        }).ToListAsync();
 
         return roleDtos;
     }
