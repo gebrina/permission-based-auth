@@ -76,11 +76,24 @@ public class UserService : IUserService
     public async Task<IEnumerable<UserDto>> GetUsersAsync(PagingFilterRequest request)
     {
         var appUsers = await _userManager.Users.ToListAsync();
+
         int pageNumber = request.PageNumber;
         int limit = request.Limit;
-        appUsers = appUsers.Skip((pageNumber-1)*limit).Take(limit).ToList();
+        var searchTerm = request.SearchTerm?.ToLower();
 
-         var users = await appUsers.ToAsyncEnumerable().SelectAwait(async (appUser) => new UserDto
+        appUsers = appUsers.Skip((pageNumber - 1) * limit).Take(limit).ToList();
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            appUsers = appUsers.Where(user =>
+            user.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) |
+            user.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) |
+            user.UserName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) |
+            user.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) |
+            user.Profession.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+
+        var users = await appUsers.ToAsyncEnumerable().SelectAwait(async (appUser) => new UserDto
         {
             Id = appUser.Id,
             UserName = appUser.UserName ?? "",
@@ -91,7 +104,7 @@ public class UserService : IUserService
             Roles = await _userManager.GetRolesAsync(appUser)
         }).ToListAsync();
 
-        return  users;
+        return users;
     }
 
     public async Task<bool> UpdateUserAsync(UserDto userDto)
