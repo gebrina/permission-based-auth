@@ -19,7 +19,7 @@ public class ProductRepository : IProductRepository
     {
         var product = new Product
         {
-            Id=Guid.NewGuid().ToString(),
+            Id = Guid.NewGuid().ToString(),
             Name = productDto.Name,
             Price = productDto.Price,
             Image = productDto.Image,

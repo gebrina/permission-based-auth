@@ -77,8 +77,8 @@ public class UserRepository : IUserRepository
     {
         var appUsers = await _userManager.Users.ToListAsync();
 
-        int pageNumber = request.PageNumber;
-        int limit = request.Limit;
+        int pageNumber = request.PageNumber | 1;
+        int limit = request.Limit | appUsers.Count;
         var searchTerm = request.SearchTerm?.ToLower();
 
         appUsers = appUsers.Skip((pageNumber - 1) * limit).Take(limit).ToList();
