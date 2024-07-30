@@ -1,6 +1,6 @@
 using System.Reflection;
 using Auth.Api.Utils;
-using Auth.Application.Repository;
+using Auth.Application.Services;
 using Auth.Domain.Dtos;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -11,23 +11,23 @@ namespace Auth.Api.Controllers;
 [Route("api/[controller]")]
 public class RolesController : ControllerBase
 {
-    private readonly IRoleRepository _roleRepo;
+    private readonly IRoleService _roleService;
     private readonly IValidator<CreateRoleDto> _createRolevalidator;
     private readonly IValidator<RoleDto> _roleValidator;
 
-    public RolesController(IRoleRepository roleRepo
+    public RolesController(IRoleService roleService
     , IValidator<CreateRoleDto> createRoleValidator,
     IValidator<RoleDto> roleValidator)
     {
         _roleValidator = roleValidator;
         _createRolevalidator = createRoleValidator;
-        _roleRepo = roleRepo;
+        _roleService = roleService;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RoleDto>>> ViewRoles()
     {
-        var result = await _roleRepo.GetRolesAsync();
+        var result = await _roleService.GetRolesAsync();
         return Ok(result);
     }
 
@@ -35,7 +35,7 @@ public class RolesController : ControllerBase
     public async Task<ActionResult<IEnumerable<RoleDto>>> ViewRole([FromRoute] string id)
     {
         if (id == null) return BadRequest("Invalid role id");
-        var role = await _roleRepo.GetRoleByIdAsync(id);
+        var role = await _roleService.GetRoleByIdAsync(id);
         if (role == null) return NotFound();
 
         return Ok(role);
@@ -51,7 +51,7 @@ public class RolesController : ControllerBase
             return BadRequest(formattedErrorResponse);
         }
 
-        var isEdited = await _roleRepo.UpdateRoleAsync(roleDto);
+        var isEdited = await _roleService.UpdateRoleAsync(roleDto);
         if (string.IsNullOrEmpty(isEdited.Item1) && isEdited.Item2)
         {
             return Ok();
@@ -77,22 +77,22 @@ public class RolesController : ControllerBase
             return BadRequest(formattedErrorResponse);
         }
 
-        if (await _roleRepo.CheckRoleExistanceAsync(roleDto.Name))
+        if (await _roleService.CheckRoleExistanceAsync(roleDto.Name))
             return BadRequest("Role already registered.");
         roleDto.ActionNames = GetActionNames();
-        var isRoleCreated = await _roleRepo.CreateRoleAsync(roleDto);
+        var isRoleCreated = await _roleService.CreateRoleAsync(roleDto);
         if (isRoleCreated) return Created();
-        return StatusCode(500,"Something went wrong.");
+        return StatusCode(500, "Something went wrong.");
     }
 
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteRole([FromRoute] string id)
     {
-        var roleToBeDeleted = await _roleRepo.GetRoleByIdAsync(id);
+        var roleToBeDeleted = await _roleService.GetRoleByIdAsync(id);
         if (string.IsNullOrEmpty(roleToBeDeleted.Id)) return BadRequest("Invalid role's id.");
 
-        await _roleRepo.DeleteRoleAsync(roleToBeDeleted);
+        await _roleService.DeleteRoleAsync(roleToBeDeleted);
         return NoContent();
     }
 

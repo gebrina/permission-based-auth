@@ -1,11 +1,10 @@
 using Auth.Api.Utils;
-using Auth.Application.Repository;
+using Auth.Application.Services;
 using Auth.Domain.Dtos;
 using Auth.Domain.Entities;
 using FluentValidation;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Auth.Api.Controllers;
 
@@ -13,15 +12,15 @@ namespace Auth.Api.Controllers;
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
-    private readonly IProductRepository _productRepo;
+    private readonly IProductService _productService;
     private readonly IValidator<CreateProductDto> _createProductValidator;
     private readonly IValidator<Product> _productValidator;
 
-    public ProductsController(IProductRepository productRepo,
+    public ProductsController(IProductService productService,
     IValidator<CreateProductDto> createProductValidator,
     IValidator<Product> productValidator)
     {
-        _productRepo = productRepo;
+        _productService = productService;
         _productValidator = productValidator;
         _createProductValidator = createProductValidator;
     }
@@ -29,13 +28,13 @@ public class ProductsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Product>>> ViewProducts()
     {
-        return Ok(await _productRepo.GetProductsAsync());
+        return Ok(await _productService.GetProductsAsync());
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Product>> ViewProduct([FromRoute] string id)
     {
-        var product = await _productRepo.GetProductByIdAsync(id);
+        var product = await _productService.GetProductByIdAsync(id);
         if (product == null) return NotFound();
         return Ok(product);
     }
@@ -67,7 +66,7 @@ public class ProductsController : ControllerBase
             .Replace(HttpContext.Request.Path, ""),
             "/uploads/", fileName);
         productDto.Image = fileUrl;
-        (string message, bool created) = await _productRepo.CreateProduct(productDto);
+        (string message, bool created) = await _productService.CreateProduct(productDto);
 
         if (!string.IsNullOrEmpty(message) && !created)
             return BadRequest(message);
@@ -85,7 +84,7 @@ public class ProductsController : ControllerBase
             return BadRequest(formattedErrorResponse);
         }
 
-        (string message, bool updated) = await _productRepo.UpdateProduct(product);
+        (string message, bool updated) = await _productService.UpdateProduct(product);
 
         if (!string.IsNullOrEmpty(message) && !updated)
             return BadRequest(message);

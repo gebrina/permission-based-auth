@@ -1,117 +1,45 @@
-using Auth.Domain.Data;
+using Auth.Application.Repository;
 using Auth.Application.Services;
 using Auth.Domain.Dtos;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace Auth.Infrastructure.Services;
 
-
 public class RoleService : IRoleService
 {
-    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly IRoleRepository _roleRepo;
 
-    public RoleService(RoleManager<IdentityRole> roleManager)
+    public RoleService(IRoleRepository roleRepository)
     {
-        _roleManager = roleManager;
+        _roleRepo = roleRepository;
     }
 
     public async Task<bool> CreateRoleAsync(CreateRoleDto role)
     {
-        IdentityRole appRole = new IdentityRole
-        {
-            Name = role.Name
-        };
-
-        var result = await _roleManager.CreateAsync(appRole);
-        if (result.Succeeded)
-        {
-
-            if (appRole.NormalizedName == Permissions.ADMIN.ToString())
-            {
-                foreach (string claimName in role.ActionNames)
-                {
-                    var claim = new Claim("Permission", claimName);
-                    await _roleManager.AddClaimAsync(appRole, claim);
-                }
-            }
-            else if (appRole.NormalizedName == Permissions.EDITOR.ToString())
-            {
-                var editorActions = role.ActionNames.Where(name =>
-                 name.StartsWith("Edit", StringComparison.OrdinalIgnoreCase) ||
-                name.StartsWith("View", StringComparison.OrdinalIgnoreCase));
-                foreach (string claimName in editorActions)
-                {
-                    var claim = new Claim("Permission", claimName);
-                    await _roleManager.AddClaimAsync(appRole, claim);
-                }
-            }
-            else
-            {
-                var editorActions = role.ActionNames.Where(name =>
-                  name.StartsWith("View", StringComparison.OrdinalIgnoreCase));
-                foreach (string claimName in editorActions)
-                {
-                    var claim = new Claim("Permission", claimName);
-                    await _roleManager.AddClaimAsync(appRole, claim);
-                }
-            }
-            return true;
-        }
-        return false;
+        return await _roleRepo.CreateRoleAsync(role);
     }
 
     public async Task<bool> DeleteRoleAsync(RoleDto role)
     {
-        var appRole = await _roleManager.FindByIdAsync(role.Id);
-        if (appRole == null) return false;
-
-        var result = await _roleManager.DeleteAsync(appRole);
-        if (result.Succeeded) return true;
-        return false;
+        return await _roleRepo.DeleteRoleAsync(role);
     }
 
     public async Task<RoleDto> GetRoleByIdAsync(string id)
     {
-        var role = await _roleManager.FindByIdAsync(id);
-        var roleDto = new RoleDto();
-        if (role != null && role.Name != null)
-        {
-            roleDto.Id = role.Id;
-            roleDto.Name = role.Name;
-        }
-        return roleDto;
+        return await _roleRepo.GetRoleByIdAsync(id);
     }
 
     public async Task<IEnumerable<RoleDto>> GetRolesAsync()
     {
-        var appRoles = await _roleManager.Roles.ToListAsync();
-        var roleDtos = await appRoles.ToAsyncEnumerable().SelectAwait(async appRole => new RoleDto
-        {
-            Id = appRole.Id,
-            Name = appRole.Name ?? "",
-            Permissions = (await _roleManager.GetClaimsAsync(appRole)).Select(x => x.Value).ToList()
-        }).ToListAsync();
-
-        return roleDtos;
+        return await _roleRepo.GetRolesAsync();
     }
 
     public async Task<(string, bool)> UpdateRoleAsync(RoleDto role)
     {
-        var appRole = await _roleManager.FindByIdAsync(role.Id);
-        if (appRole == null) return ("Invalid role", false);
-
-        appRole.Name = role.Name;
-
-        var result = await _roleManager.UpdateAsync(appRole);
-        if (result.Succeeded) return (string.Empty, true);
-        return ("Something went wrong.", false);
+        return await _roleRepo.UpdateRoleAsync(role);
     }
 
     public async Task<bool> CheckRoleExistanceAsync(string roleName)
     {
-        var roleExist = await _roleManager.RoleExistsAsync(roleName);
-        return roleExist;
+        return await _roleRepo.CheckRoleExistanceAsync(roleName);
     }
 }

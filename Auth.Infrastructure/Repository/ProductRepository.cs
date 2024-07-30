@@ -1,41 +1,82 @@
 using Auth.Application.Repository;
-using Auth.Application.Services;
+using Auth.Domain.Data;
 using Auth.Domain.Dtos;
 using Auth.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Infrastructure.Repository;
 
 public class ProductRepository : IProductRepository
 {
-    private IProductService _service;
+    private readonly ApplicationDbContext _dbContext;
 
-    public ProductRepository(IProductService service)
+    public ProductRepository(ApplicationDbContext dbContext)
     {
-        _service = service;
+        _dbContext = dbContext;
     }
 
     public async Task<(string message, bool created)> CreateProduct(CreateProductDto productDto)
     {
-        return await _service.CreateProduct(productDto);
+        var product = new Product
+        {
+            Id=Guid.NewGuid().ToString(),
+            Name = productDto.Name,
+            Price = productDto.Price,
+            Image = productDto.Image,
+            Category = productDto.Category
+        };
+        var state = await _dbContext.Products.AddAsync(product);
+        await _dbContext.SaveChangesAsync();
+
+        if (state.Entity.Id == null) return (
+            message: "Something went wrong",
+            created: false
+        );
+
+        return (
+            message: string.Empty,
+            created: true
+        ); ;
     }
 
     public async Task<bool> DeleteProduct(string id)
     {
-        return await _service.DeleteProduct(id);
+        var product = await _dbContext.Products.FirstOrDefaultAsync(_ => _.Id == id);
+        if (product == null) return false;
+
+        _dbContext.Products.Remove(product);
+        _dbContext.SaveChanges();
+        return true;
     }
 
     public async Task<Product> GetProductByIdAsync(string id)
     {
-        return await _service.GetProductByIdAsync(id);
+        var product = await _dbContext.Products.FirstAsync(_ => _.Id == id);
+        return product;
     }
 
-    public Task<IEnumerable<Product>> GetProductsAsync()
+    public async Task<IEnumerable<Product>> GetProductsAsync()
     {
-        return _service.GetProductsAsync();
+        var products = await _dbContext.Products.ToListAsync();
+        return products;
     }
 
     public async Task<(string message, bool updated)> UpdateProduct(Product product)
     {
-        return await _service.UpdateProduct(product);
+        var productInDb = await _dbContext.Products.FindAsync(product);
+        if (productInDb == null) return (
+            message: "Invalid product",
+            updated: false
+        );
+
+        productInDb.Name = product.Name;
+        productInDb.Category = product.Category;
+        productInDb.Price = product.Price;
+        productInDb.Image = product.Image;
+
+        return (
+            message: string.Empty,
+            updated: true
+        );
     }
 }
