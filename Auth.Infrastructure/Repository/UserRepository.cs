@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using Auth.Application.Repository;
 using Auth.Domain.Dtos;
 using Auth.Domain.Entities;
@@ -70,6 +71,24 @@ public class UserRepository : IUserRepository
             userDto.Roles = await _userManager.GetRolesAsync(appUser);
         }
 
+        return userDto;
+    }
+
+    public async Task<UserDto> GetUserByEmailAsync(string email)
+    {
+        UserDto userDto = new();
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user?.Email != null && user.UserName != null)
+        {
+            var userRoles = await _userManager.GetRolesAsync(user);
+            userDto.Id = user.Id;
+            userDto.FirstName = user.FirstName;
+            userDto.LastName = user.LastName;
+            userDto.Email = user.Email;
+            userDto.Profession = user.Profession;
+            userDto.UserName = user.UserName;
+            userDto.Roles = userRoles;
+        };
         return userDto;
     }
 

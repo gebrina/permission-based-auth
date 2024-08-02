@@ -27,6 +27,11 @@ public class UserService : IUserService
     {
         return await _userRepo.GetUserByIdAsync(id);
     }
+    
+    public async Task<UserDto> GetUserByEmailAsync(string email)
+    {
+        return await _userRepo.GetUserByEmailAsync(email);
+    }
 
     public async Task<IEnumerable<UserDto>> GetUsersAsync(PagingFilterRequest request)
     {
@@ -37,4 +42,5 @@ public class UserService : IUserService
     {
         return await _userRepo.UpdateUserAsync(user);
     }
+
 }
