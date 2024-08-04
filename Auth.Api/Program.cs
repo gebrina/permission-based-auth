@@ -10,6 +10,7 @@ using Auth.Infrastructure.Services;
 using Auth.Domain.Entities;
 using Auth.Api.Common;
 using Microsoft.AspNetCore.Mvc;
+using Auth.Api.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,9 +37,15 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>().
 AddDefaultTokenProviders();
 
+// Bind jwt config from app-settings.json
+builder.Services.Configure<JwtConfigSettings>(
+    builder.Configuration.GetRequiredSection(nameof(JwtConfigSettings))
+);
+
 // Disable defautl model validation
-builder.Services.Configure<ApiBehaviorOptions>(options=>{
-    options.SuppressModelStateInvalidFilter=true;
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
 });
 
 // user
@@ -53,7 +60,13 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
+// Login
+builder.Services.AddScoped<ILoginRepository, LoginRepository>();
+builder.Services.AddScoped<ILoginService, LoginService>();
+
+// add fluent vlaidtions to DI
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
