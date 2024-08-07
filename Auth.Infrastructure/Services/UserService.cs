@@ -1,6 +1,7 @@
 using Auth.Application.Repository;
 using Auth.Application.Services;
 using Auth.Domain.Dtos;
+using Auth.Domain.Entities;
 
 namespace Auth.Infrastructure.Services;
 
@@ -28,7 +29,7 @@ public class UserService : IUserService
         return await _userRepo.GetUserByIdAsync(id);
     }
     
-    public async Task<UserDto> GetUserByEmailAsync(string email)
+    public async Task<ApplicationUser> GetUserByEmailAsync(string email)
     {
         return await _userRepo.GetUserByEmailAsync(email);
     }

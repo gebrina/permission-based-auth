@@ -74,22 +74,10 @@ public class UserRepository : IUserRepository
         return userDto;
     }
 
-    public async Task<UserDto> GetUserByEmailAsync(string email)
+    public async Task<ApplicationUser> GetUserByEmailAsync(string email)
     {
-        UserDto userDto = new();
         var user = await _userManager.FindByEmailAsync(email);
-        if (user?.Email != null && user.UserName != null)
-        {
-            var userRoles = await _userManager.GetRolesAsync(user);
-            userDto.Id = user.Id;
-            userDto.FirstName = user.FirstName;
-            userDto.LastName = user.LastName;
-            userDto.Email = user.Email;
-            userDto.Profession = user.Profession;
-            userDto.UserName = user.UserName;
-            userDto.Roles = userRoles;
-        };
-        return userDto;
+       return user;
     }
 
     public async Task<IEnumerable<UserDto>> GetUsersAsync(PagingFilterRequest request)

@@ -20,11 +20,23 @@ public class LoginRepository : ILoginRepository
 
     public async Task<LoginResponseDto> AuthenticateAsync(LoginRequestDto loginRequest)
     {
-        return new LoginResponseDto
+        var response = new LoginResponseDto
         {
             Status = LoginStatus.REJECT,
             AccessToken = null,
             RefreshToken = null
         };
+
+        var user = await _userService.GetUserByEmailAsync(loginRequest.Email);
+        if (user != null)
+        {
+            var result = await _signInManager.PasswordSignInAsync(user, loginRequest.Password, false, true);
+            if (!result.Succeeded)
+                response.Status = LoginStatus.FAIL;
+            else
+                response.Status = LoginStatus.SUCCESS;
+        }
+        
+        return response;
     }
 }
