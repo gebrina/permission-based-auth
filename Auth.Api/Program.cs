@@ -1,16 +1,17 @@
 using FluentValidation;
-using Auth.Domain.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
+using Auth.Domain.Data;
 using Auth.Application.Repository;
 using Auth.Infrastructure.Repository;
 using Auth.Application.Services;
 using Auth.Infrastructure.Services;
 using Auth.Domain.Entities;
 using Auth.Api.Common;
-using Microsoft.AspNetCore.Mvc;
 using Auth.Api.Settings;
+using Auth.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,9 @@ AddDefaultTokenProviders();
 builder.Services.Configure<JwtConfigSettings>(
     builder.Configuration.GetRequiredSection(nameof(JwtConfigSettings))
 );
+
+// Add JwtServiceConfig 
+builder.Services.AddJwtAuthConfig();
 
 // Disable defautl model validation
 builder.Services.Configure<ApiBehaviorOptions>(options =>
