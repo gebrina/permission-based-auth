@@ -17,6 +17,8 @@ public static class JwtServiceExtensions
         .AddJwtBearer(options =>
         {
             var secretKey = Encoding.UTF8.GetBytes(jwtConfig.SecretKey);
+            options.SaveToken = true;
+
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = true,
@@ -26,7 +28,12 @@ public static class JwtServiceExtensions
                 ValidIssuer = jwtConfig.Issuer,
                 IssuerSigningKey = new SymmetricSecurityKey(secretKey)
             };
-        });
+        }).AddBearerToken();
         return services;
+    }
+
+    private static Func<JwtBearerChallengeContext, Task> async()
+    {
+        throw new NotImplementedException();
     }
 }
