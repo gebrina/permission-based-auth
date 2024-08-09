@@ -77,7 +77,7 @@ public class UserRepository : IUserRepository
     public async Task<ApplicationUser> GetUserByEmailAsync(string email)
     {
         var user = await _userManager.FindByEmailAsync(email);
-       return user;
+        return user;
     }
 
     public async Task<IEnumerable<UserDto>> GetUsersAsync(PagingFilterRequest request)
@@ -125,7 +125,20 @@ public class UserRepository : IUserRepository
         appUser.LastName = userDto.LastName;
         appUser.Profession = userDto.Profession;
         var result = await _userManager.UpdateAsync(appUser);
-        if (result.Succeeded) return true;
+        if (result.Succeeded)
+        {
+            foreach (string role in userDto.Roles)
+            {
+                if (
+                 await _roleManager.RoleExistsAsync(role) &&
+                 !await _userManager.IsInRoleAsync(appUser, role)
+                 )
+                {
+                    await _userManager.AddToRoleAsync(appUser, role);
+                }
+            }
+            return true;
+        }
         return false;
     }
 }
