@@ -1,4 +1,5 @@
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Claims;
 using Auth.Application.Repository;
 using Auth.Domain.Dtos;
 using Auth.Domain.Entities;
@@ -140,5 +141,27 @@ public class UserRepository : IUserRepository
             return true;
         }
         return false;
+    }
+
+    public async Task<IList<string>> GetUserRoleClaimsAsync(UserDto userDto)
+    {
+        IList<string> userRoleClaims = [];
+        var user = await GetUserByIdAsync(userDto.Id);
+        foreach (var userRole in user.Roles)
+        {
+            var role = await _roleManager.FindByNameAsync(userRole);
+            if (role != null)
+            {
+                var claims = await _roleManager.GetClaimsAsync(role);
+                foreach (Claim claim in claims)
+                {
+                    var isAdded = userRoleClaims.Any(roleClaim => roleClaim == claim.Value);
+                    if (!isAdded)
+                        userRoleClaims.Add(claim.Value);
+                }
+            }
+        }
+
+        return userRoleClaims;
     }
 }

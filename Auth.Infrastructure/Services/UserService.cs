@@ -28,7 +28,7 @@ public class UserService : IUserService
     {
         return await _userRepo.GetUserByIdAsync(id);
     }
-    
+
     public async Task<ApplicationUser> GetUserByEmailAsync(string email)
     {
         return await _userRepo.GetUserByEmailAsync(email);
@@ -44,4 +44,8 @@ public class UserService : IUserService
         return await _userRepo.UpdateUserAsync(user);
     }
 
+    public async Task<IList<string>> GetUserRoleClaimsAsync(UserDto userDto)
+    {
+        return await _userRepo.GetUserRoleClaimsAsync(userDto);
+    }
 }

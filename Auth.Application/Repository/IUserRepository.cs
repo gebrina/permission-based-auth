@@ -11,4 +11,5 @@ public interface IUserRepository
     Task<bool> CreateUserAsync(CreateUserDto user);
     Task<bool> UpdateUserAsync(UserDto user);
     Task<bool> DeleteUserAsync(UserDto user);
+    Task<IList<string>> GetUserRoleClaimsAsync(UserDto userDto);
 }
