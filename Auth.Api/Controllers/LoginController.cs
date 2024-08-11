@@ -57,6 +57,7 @@ public class LoginController : ControllerBase
 
       var userClaims = await _userService.GetUserRoleClaimsAsync(userDto);
       (string accessToken, string refreshToken) = _jwtService.GenerateTokens(userDto, userClaims);
+      
       return new LoginResponseDto
       {
          Status = LoginStatus.SUCCESS,
