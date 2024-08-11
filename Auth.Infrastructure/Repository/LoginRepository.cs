@@ -23,8 +23,8 @@ public class LoginRepository : ILoginRepository
         var response = new LoginResponseDto
         {
             Status = LoginStatus.REJECT,
-            AccessToken = null,
-            RefreshToken = null
+            AccessToken = string.Empty,
+            RefreshToken = string.Empty
         };
 
         var user = await _userService.GetUserByEmailAsync(loginRequest.Email);
