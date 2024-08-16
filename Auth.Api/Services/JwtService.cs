@@ -2,13 +2,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Auth.Api.Settings;
+using Auth.Application.Services;
 using Auth.Domain.Dtos;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Auth.Api.Services;
 
-public class JwtService
+public class JwtService:IJwtService
 {
     private readonly JwtConfigSettings _jwtConfig;
 

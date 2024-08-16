@@ -1,4 +1,3 @@
-using Auth.Api.Services;
 using Auth.Api.Utils;
 using Auth.Application.Services;
 using Auth.Domain.Dtos;
@@ -15,12 +14,12 @@ public class LoginController : ControllerBase
    private readonly ILoginService _loginService;
    private readonly IUserService _userService;
    private readonly IValidator<LoginRequestDto> _validator;
-   private readonly JwtService _jwtService;
+   private readonly IJwtService _jwtService;
 
    public LoginController(ILoginService loginService,
    IValidator<LoginRequestDto> validator,
    IUserService userService,
-   JwtService jwtService)
+   IJwtService jwtService)
    {
       _validator = validator;
       _loginService = loginService;

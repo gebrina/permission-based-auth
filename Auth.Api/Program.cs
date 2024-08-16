@@ -39,7 +39,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>().
 AddDefaultTokenProviders();
 
-// Bind jwt config from app-settings.json
 builder.Services.Configure<JwtConfigSettings>(
     builder.Configuration.GetRequiredSection(nameof(JwtConfigSettings))
 );
@@ -47,7 +46,13 @@ builder.Services.AddScoped<JwtService>();
 
 // Add JwtServiceConfig 
 builder.Services.AddJwtAuthConfig();
-builder.Services.AddSingleton<JwtService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+
+builder.Services.AddScoped<IEmailService,EmailService>();
+// Bing Email configs to EmailSettings 
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetRequiredSection(nameof(EmailSettings))
+);
 
 // Disable defautl model validation
 builder.Services.Configure<ApiBehaviorOptions>(options =>
