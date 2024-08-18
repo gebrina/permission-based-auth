@@ -163,4 +163,13 @@ public class UserRepository : IUserRepository
 
         return userRoleClaims;
     }
+
+    public async Task<string> GetEmailConfirmationToken(string id)
+    {
+        string confirmationToken = string.Empty;
+        var user = await _userManager.FindByIdAsync(id);
+        if (user is not null)
+            confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        return confirmationToken;
+    }
 }

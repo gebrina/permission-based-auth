@@ -25,6 +25,7 @@ mono_crash.*
 [Rr]elease/
 [Rr]eleases/
 Auth.Api/wwwroot/*
+Auth.Api/email.*
 # Migrations genereated by ef core
 Migrations
 x64/
