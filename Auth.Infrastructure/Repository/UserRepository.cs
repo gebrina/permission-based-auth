@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Auth.Application.Repository;
 using Auth.Domain.Dtos;
 using Auth.Domain.Entities;
+using Auth.Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,9 +43,12 @@ public class UserRepository : IUserRepository
                 }
             }
             return true;
+        }else{
+            string errorMessage = "";
+            foreach(var error in result.Errors)
+            errorMessage+=error.Code +"-"+ error.Description+Environment.NewLine;
+            throw new BadRequestException(errorMessage);
         }
-
-        return false;
     }
 
     public async Task<bool> DeleteUserAsync(UserDto user)
@@ -164,10 +168,10 @@ public class UserRepository : IUserRepository
         return userRoleClaims;
     }
 
-    public async Task<string> GetEmailConfirmationToken(string id)
+    public async Task<string> GetEmailConfirmationToken(string email)
     {
         string confirmationToken = string.Empty;
-        var user = await _userManager.FindByIdAsync(id);
+        var user = await _userManager.FindByEmailAsync(email);
         if (user is not null)
             confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         return confirmationToken;

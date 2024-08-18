@@ -13,5 +13,5 @@ public interface IUserService
     Task<bool> UpdateUserAsync(UserDto user);
     Task<bool> DeleteUserAsync(UserDto user);
     Task<IList<string>> GetUserRoleClaimsAsync(UserDto userDto);
-    Task<string> GetEmailConfirmationToken(string id);
+    Task<string> GetEmailConfirmationToken(string email);
 }

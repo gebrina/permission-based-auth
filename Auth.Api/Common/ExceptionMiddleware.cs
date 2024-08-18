@@ -1,4 +1,7 @@
 
+using System.Net;
+using Auth.Infrastructure.Exceptions;
+
 namespace Auth.Api.Common;
 
 public class ExceptionMiddleware
@@ -24,14 +27,21 @@ public class ExceptionMiddleware
 
     private static async Task SendExceptionResponse(Exception exception, HttpContext context)
     {
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        HttpStatusCode statusCode = exception switch
+        {
+            BadRequestException => HttpStatusCode.BadRequest,
+            _ => HttpStatusCode.InternalServerError
+        };
 
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)statusCode;
         var errorResponse = new
         {
-            message = "Unexpected error happened.",
+            message = exception is BadRequestException ?
+             "Invalid request." : "Unexpected error happened.",
             detail = exception.Message
         };
+
 
         await context.Response.WriteAsJsonAsync(errorResponse);
     }

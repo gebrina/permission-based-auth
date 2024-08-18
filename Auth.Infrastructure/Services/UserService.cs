@@ -49,8 +49,8 @@ public class UserService : IUserService
         return await _userRepo.GetUserRoleClaimsAsync(userDto);
     }
 
-    public async Task<string> GetEmailConfirmationToken(string id)
+    public async Task<string> GetEmailConfirmationToken(string email)
     {
-        return await _userRepo.GetEmailConfirmationToken(id);
+        return await _userRepo.GetEmailConfirmationToken(email);
     }
 }
