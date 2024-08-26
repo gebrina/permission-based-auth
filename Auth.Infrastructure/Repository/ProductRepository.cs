@@ -23,8 +23,10 @@ public class ProductRepository : IProductRepository
             Name = productDto.Name,
             Price = productDto.Price,
             Image = productDto.Image,
-            Category = productDto.Category
+            Category = productDto.Category,
+            Description = productDto.Description
         };
+
         var state = await _dbContext.Products.AddAsync(product);
         await _dbContext.SaveChangesAsync();
 
@@ -73,6 +75,7 @@ public class ProductRepository : IProductRepository
         productInDb.Category = product.Category;
         productInDb.Price = product.Price;
         productInDb.Image = product.Image;
+        productInDb.Description=product.Description;
 
         return (
             message: string.Empty,
