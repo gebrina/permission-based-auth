@@ -17,5 +17,6 @@ public class ProductDtoValidator : AbstractValidator<Product>
         RuleFor(product => product.Image).NotEmpty().NotNull();
         RuleFor(product => product.Category).NotNull().NotEmpty()
         .WithMessage("Product category is required.");
+        RuleFor(product=>product.Description).NotEmpty().NotNull();
     }
 }

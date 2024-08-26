@@ -14,5 +14,6 @@ public class CreateProductDtoValidator : AbstractValidator<CreateProductDto>
         .LessThan(1000);
         RuleFor(product => product.Category).NotNull().NotEmpty()
         .WithMessage("Product category is required.");
+        RuleFor(product=>product.Description).NotEmpty().NotNull();
     }
 }

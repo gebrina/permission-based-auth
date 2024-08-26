@@ -35,7 +35,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     });
 });
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options=>{
+    options.User.RequireUniqueEmail = true;
+})
 .AddEntityFrameworkStores<ApplicationDbContext>().
 AddDefaultTokenProviders();
 
